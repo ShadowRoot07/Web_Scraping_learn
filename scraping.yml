@@ -1,0 +1,27 @@
+name: Ejecutar Scraping con Playwright
+
+on:
+  push: # Se activa cada vez que subes código (git push)
+  workflow_dispatch: # Permite darle a un botón "Play" manual en GitHub
+
+jobs:
+  scraping_job:
+    runs-on: ubuntu-latest # La máquina potente en la nube
+
+    steps:
+    - name: Descargar mi código
+      uses: actions/checkout@v4
+
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar Playwright y dependencias
+      run: |
+        pip install playwright
+        playwright install chromium --with-deps
+
+    - name: 🚀 Ejecutar mi Bot
+      run: python bot_playwright.py
+
