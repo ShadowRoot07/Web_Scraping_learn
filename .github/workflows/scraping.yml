@@ -1,15 +1,14 @@
-name: Ejecutar Scraping con Playwright
+name: Ejecutar Automatización de Scraping
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   scraping_job:
     runs-on: ubuntu-latest
 
-    # Añadimos permisos de escritura para que el bot pueda subir archivos
     permissions:
       contents: write
 
@@ -22,27 +21,30 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: 🛠️ Instalar Playwright y dependencias
+    - name: 🛠️ Instalar Dependencias
       run: |
-        pip install playwright
+        pip install scrapy playwright
         playwright install chromium --with-deps
 
-    - name: 🚀 Ejecutar Extractor de Imágenes
-      # Cambiamos el comando para que ejecute el nuevo script de imágenes
-      run: python PlayWright/extractor_imagenes.py
-
-    - name: 📤 Subir cambios al Repositorio
+    - name: 🕸️ Ejecutar Arañas de Scrapy
+      # Usamos runspider para ejecutar archivos .py individuales sin crear un proyecto complejo
+      # El flag -o guarda la salida en un archivo automáticamente
       run: |
-        # Configuramos la identidad del bot (ShadowRoot Cloud)
+        python -m scrapy runspider Scrapy/spider_libros.py -o archivos_extraidos/datos_scrapy.json
+
+    - name: 🚀 Ejecutar Scripts de Playwright (Opcional)
+      # Mantenemos esto por si quieres seguir usando tus otros bots
+      run: |
+        python PlayWright/extractor_imagenes.py || echo "No se encontró el script de imágenes"
+
+    - name: 📤 Subir Resultados al Repositorio
+      run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # Agregamos la imagen descargada
-        git add archivos_extraidos/*.jpg
+        # Agregamos JSONs, CSVs e Imágenes
+        git add archivos_extraidos/*.json archivos_extraidos/*.jpg archivos_extraidos/*.csv
         
-        # Hacemos el commit. Si no hay cambios, no da error.
-        git commit -m "feat: imagen capturada por Playwright [skip ci]" || echo "No hay cambios para subir"
-        
-        # Mandamos los archivos de vuelta a tu GitHub
+        git commit -m "feat: actualización de datos automática [skip ci]" || echo "Sin cambios"
         git push
 
