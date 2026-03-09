@@ -1,0 +1,45 @@
+name: Bot de Scraping Diario Automático
+
+on:
+  push:
+    branches: [ main ]
+  # --- ESTA ES LA MAGIA DEL CRON ---
+  schedule:
+    - cron: '0 12 * * *' 
+  # ---------------------------------
+  workflow_dispatch: # Mantenemos el botón manual por si acaso
+
+jobs:
+  scraping_job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: 📥 Descargar mi código
+      uses: actions/checkout@v4
+
+    - name: 🐍 Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: 🛠️ Instalar Dependencias
+      run: |
+        pip install scrapy playwright
+        playwright install chromium --with-deps
+
+    - name: 🕷️ Ejecutar todas las Arañas
+      run: |
+        # Aquí puedes poner todos los scripts que quieras que corran solos
+        python -m scrapy runspider Scrapy/spider_libros.py -o archivos_extraidos/datos_diarios.json
+        python PlayWright/extractor_imagenes.py
+
+    - name: 📤 Guardar Resultados Automáticamente
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add archivos_extraidos/*
+        git commit -m "chore: actualización diaria de datos [skip ci]" || echo "Sin cambios hoy"
+        git push
+

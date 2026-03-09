@@ -1,0 +1,17 @@
+usuario: ShadowRoot07
+herramientas:
+  - NeoVim
+  - Termux
+  - Python
+proyectos:
+  web_scraping:
+    estado: completado
+    librerias_dominadas:
+      - BeautifulSoup
+      - Selenium
+      - Playwright
+      - Scrapy
+  automatizacion:
+    estado: en_progreso
+    lenguaje: YAML
+

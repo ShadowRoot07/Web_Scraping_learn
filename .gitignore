@@ -1,0 +1,13 @@
+# Secretos
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+
+# Datos extraídos (opcional, por si no quieres subir JSONs gigantes)
+archivos_extraidos/*.json
+archivos_extraidos/*.csv
+
